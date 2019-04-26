@@ -1,8 +1,83 @@
 <html>
   <head>
     <title>NinjaMan</title>
+    <style type="text/css">
+      * {
+        margin: 0;
+        padding: 0;
+      }
+      .wall {
+        background-color: blue;
+        width: 40px;
+        height: 40px;
+        display: inline-block;
+      }
+      .blank {
+        background-color: black;
+        width: 40px;
+        height: 40px;
+        display: inline-block;
+      }
+      .sushi {
+        background-color: black;
+        background-image: url("assets/sushi.png");
+        background-size: contain;
+        width: 40px;
+        height: 40px;
+        display: inline-block;
+      }
+      #ninja {
+        background-color: black;
+        background-image: url("assets/ninja.gif");
+        background-size: contain;
+        width: 40px;
+        height: 40px;
+        position: absolute;
+        top: 76.67px;
+        left: 40px;
+      }
+    </style>
   </head>
   <body>
     <h1>Welcome to NinjaMan Game</h1>
+    <div id="world"></div>
+    <div id="ninja"></div>
+
+    <script>
+      let world = [
+        [1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [1, 0, 2, 1, 0, 0, 0, 1, 1],
+        [1, 0, 1, 0, 0, 1, 0, 1, 1],
+        [1, 0, 2, 1, 0, 1, 0, 0, 1],
+        [1, 0, 1, 0, 0, 1, 1, 0, 1],
+        [1, 0, 2, 1, 0, 1, 0, 0, 1],
+        [1, 1, 2, 1, 0, 1, 1, 0, 1],
+        [1, 2, 0, 0, 0, 0, 0, 0, 1],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1]
+      ];
+
+      let worldDict = {
+        0: "blank",
+        1: "wall",
+        2: "sushi"
+      };
+
+      let output = "";
+
+      const drawWorld = () => {
+        for (let i = 0; i < world.length; i++) {
+          //make rows
+          output += "<div class = 'row'>";
+          for (let x = 0; x < world[i].length; x++) {
+            // each row a number of blocks
+            output += "<div class ='" + worldDict[world[i][x]] + "'></div>";
+          }
+          output += "</div>"; //close the "row" div
+        }
+
+        document.getElementById("world").innerHTML = output;
+      };
+      drawWorld();
+    </script>
   </body>
 </html>
