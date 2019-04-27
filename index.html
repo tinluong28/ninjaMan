@@ -26,6 +26,14 @@
         background-image: url("assets/sushi.png");
         background-size: contain;
       }
+      .onigiri {
+        background-color: black;
+        width: 40px;
+        height: 40px;
+        display: inline-block;
+        background-image: url("assets/onigiri.png");
+        background-size: contain;
+      }
       #ninja {
         background-color: black;
         width: 40px;
@@ -55,7 +63,7 @@
       //   [1, 2, 0, 0, 0, 0, 0, 0, 1],
       //   [1, 1, 1, 1, 1, 1, 1, 1, 1]
       // ];
-      const arr = [0, 1, 2];
+      const arr = [0, 1, 2, 3];
 
       const randomWorld = (row, col) => {
         let world = [];
@@ -81,7 +89,8 @@
         // assign desc
         0: "blank",
         1: "wall",
-        2: "sushi"
+        2: "sushi",
+        3: "onigiri"
       };
 
       const drawWorld = () => {
