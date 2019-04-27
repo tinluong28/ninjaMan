@@ -20,31 +20,31 @@
       }
       .sushi {
         background-color: black;
-        background-image: url("assets/sushi.png");
-        background-size: contain;
         width: 40px;
         height: 40px;
         display: inline-block;
+        background-image: url("assets/sushi.png");
+        background-size: contain;
       }
       #ninja {
         background-color: black;
-        background-image: url("assets/ninja.gif");
-        background-size: contain;
         width: 40px;
         height: 40px;
         position: absolute;
-        top: 76.67px;
+        background-image: url("assets/ninja.gif");
+        background-size: contain;
+        top: 40px;
         left: 40px;
       }
     </style>
   </head>
   <body>
-    <h1>Welcome to NinjaMan Game</h1>
     <div id="world"></div>
     <div id="ninja"></div>
 
     <script>
       let world = [
+        //create maze using array
         [1, 1, 1, 1, 1, 1, 1, 1, 1],
         [1, 0, 2, 1, 0, 0, 0, 1, 1],
         [1, 0, 1, 0, 0, 1, 0, 1, 1],
@@ -57,6 +57,7 @@
       ];
 
       let worldDict = {
+        // assign desc
         0: "blank",
         1: "wall",
         2: "sushi"
@@ -78,6 +79,43 @@
         document.getElementById("world").innerHTML = output;
       };
       drawWorld();
+
+      let ninjaman = {
+        x: 1,
+        y: 1
+      };
+
+      let updateNinja = () => {
+        document.getElementById("ninja").style.top = ninjaman.y * 40 + "px";
+        document.getElementById("ninja").style.left = ninjaman.x * 40 + "px";
+      };
+      document.onkeydown = e => {
+        console.log("key: ", e.keyCode);
+        if (e.keyCode === 37) {
+          //LEFT
+          if (world[ninjaman.y][ninjaman.x - 1] != 1) {
+            ninjaman.x--;
+          }
+        } else if (e.keyCode === 39) {
+          //RIGHT
+          if (world[ninjaman.y][ninjaman.x + 1] != 1) {
+            ninjaman.x++;
+          }
+        } else if (e.keyCode === 38) {
+          //UP
+          if (world[ninjaman.y - 1][ninjaman.x] != 1) {
+            ninjaman.y--;
+          }
+        } else if (e.keyCode === 40) {
+          //DOWN
+          if (world[ninjaman.y + 1][ninjaman.x] != 1) {
+            ninjaman.y++;
+          }
+        }
+        world[ninjaman.y][ninjaman.x] = 0;
+        updateNinja();
+        drawWorld();
+      };
     </script>
   </body>
 </html>
