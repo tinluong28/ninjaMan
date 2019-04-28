@@ -44,47 +44,102 @@
         top: 40px;
         left: 40px;
       }
+      #table {
+        position: absolute;
+        display: inline-block;
+        top: 0px;
+      }
+      .score {
+        text-align: left;
+        display: inline-block;
+      }
+      #score {
+        display: inline-block;
+      }
+      #mode {
+        display: inline-block;
+      }
+      #level {
+        display: inline-block;
+      }
     </style>
   </head>
   <body>
     <div id="world"></div>
     <div id="ninja"></div>
+    <div id="table">
+      <div>
+        <h1 class="score">Score:</h1>
+        <h1 id="score">0</h1>
+      </div>
+      <div>
+        <h1 id="mode">Mode:</h1>
+        <div id="level">
+          <button id="easy">Easy(9x9)</button>
+          <button id="medium">Medium(12x12)</button>
+          <button id="hard">Hard(15x15)</button>
+        </div>
+      </div>
+    </div>
 
     <script>
-      // let world = [
-      //   //create maze using array
-      //   [1, 1, 1, 1, 1, 1, 1, 1, 1],
-      //   [1, 0, 2, 1, 0, 0, 0, 1, 1],
-      //   [1, 0, 1, 0, 0, 1, 0, 1, 1],
-      //   [1, 0, 2, 1, 0, 1, 0, 0, 1],
-      //   [1, 0, 1, 0, 0, 1, 1, 0, 1],
-      //   [1, 0, 2, 1, 0, 1, 0, 0, 1],
-      //   [1, 1, 2, 1, 0, 1, 1, 0, 1],
-      //   [1, 2, 0, 0, 0, 0, 0, 0, 1],
-      //   [1, 1, 1, 1, 1, 1, 1, 1, 1]
-      // ];
-      const arr = [0, 1, 2, 3];
+      // Initial keys for characters
+      const worldChara = [0, 1, 2, 3];
+      // Set ninjman initial coordinates
+      let ninjaman = {
+        x: 1,
+        y: 1
+      };
 
+      // Generate random world based on the num of row and col
       const randomWorld = (row, col) => {
         let world = [];
         for (let i = 0; i < row; i++) {
           world[i] = [];
           world[i][0] = 1;
-          world[i][col] = 1;
-          for (let j = 1; j < col; j++) {
+          world[i][col - 1] = 1;
+          for (let j = 1; j < col - 1; j++) {
             if (i === 0 || i == row - 1) {
               world[i][j] = 1;
             } else if (i == 1 && j == 1) {
               world[i][j] = 0;
             } else {
-              world[i][j] = arr[Math.floor(Math.random() * arr.length)];
+              world[i][j] =
+                worldChara[Math.floor(Math.random() * worldChara.length)];
             }
           }
         }
         console.log(world);
         return world;
       };
-      world = randomWorld(12, 9);
+      // Set initial world
+      let world = randomWorld(9, 9);
+      // Set game difficulty
+      const setLevel = level => {
+        if (level == "easy") {
+          world = randomWorld(9, 9);
+        } else if (level == "medium") {
+          world = randomWorld(12, 12);
+        } else if (level == "hard") {
+          world = randomWorld(15, 15);
+        }
+        // Reset ninjaman position and score
+        ninjaman.y = 1;
+        ninjaman.x = 1;
+        drawWorld();
+        updateNinja();
+        updateScore(0);
+      };
+      // onclick events for the difficulty button
+      document
+        .getElementById("easy")
+        .addEventListener("click", () => setLevel("easy"));
+      document
+        .getElementById("medium")
+        .addEventListener("click", () => setLevel("medium"));
+      document
+        .getElementById("hard")
+        .addEventListener("click", () => setLevel("hard"));
       let worldDict = {
         // assign desc
         0: "blank",
@@ -93,6 +148,7 @@
         3: "onigiri"
       };
 
+      // Generate HTML to draw world
       const drawWorld = () => {
         output = "";
         for (let i = 0; i < world.length; i++) {
@@ -106,18 +162,22 @@
         }
 
         document.getElementById("world").innerHTML = output;
+        document.getElementById("table").style.left =
+          world[1].length * 40 + 100 + "px";
       };
       drawWorld();
 
-      let ninjaman = {
-        x: 1,
-        y: 1
-      };
-
+      let score = 0;
+      // Update ninjaman position
       let updateNinja = () => {
         document.getElementById("ninja").style.top = ninjaman.y * 40 + "px";
         document.getElementById("ninja").style.left = ninjaman.x * 40 + "px";
       };
+      // Update score sheet
+      let updateScore = score => {
+        return (document.getElementById("score").innerHTML = score);
+      };
+      // Ninjaman's movement
       document.onkeydown = e => {
         if (e.keyCode === 37) {
           //LEFT
@@ -140,7 +200,15 @@
             ninjaman.y++;
           }
         }
+        // Keeping score
+        if (world[ninjaman.y][ninjaman.x] == 2) {
+          score += 10;
+        } else if (world[ninjaman.y][ninjaman.x] == 3) {
+          score += 5;
+        }
+        // Setting sushi/onigiri to blank space
         world[ninjaman.y][ninjaman.x] = 0;
+        updateScore(score);
         updateNinja();
         drawWorld();
       };
