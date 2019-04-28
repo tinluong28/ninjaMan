@@ -34,6 +34,16 @@
         background-image: url("assets/onigiri.png");
         background-size: contain;
       }
+      #ghost {
+        background-color: black;
+        width: 40px;
+        height: 40px;
+        position: absolute;
+        background-image: url("assets/bluey.gif");
+        background-size: contain;
+        top: 280px;
+        left: 280px;
+      }
       #ninja {
         background-color: black;
         width: 40px;
@@ -67,6 +77,7 @@
   <body>
     <div id="world"></div>
     <div id="ninja"></div>
+    <div id="ghost"></div>
     <div id="table">
       <div>
         <h1 class="score">Score:</h1>
@@ -85,12 +96,17 @@
     <script>
       // Initial keys for characters
       const worldChara = [0, 1, 2, 3];
+      const ghostChara = [0, 1, 2, 3, 4];
       // Set ninjman initial coordinates
       let ninjaman = {
         x: 1,
         y: 1
       };
-
+      // Set ghost initial coordinates
+      let ghost = {
+        x: 7,
+        y: 7
+      };
       // Generate random world based on the num of row and col
       const randomWorld = (row, col) => {
         let world = [];
@@ -102,6 +118,8 @@
             if (i === 0 || i == row - 1) {
               world[i][j] = 1;
             } else if (i == 1 && j == 1) {
+              world[i][j] = 0;
+            } else if (i == row - 2 && j == col - 2) {
               world[i][j] = 0;
             } else {
               world[i][j] =
@@ -118,10 +136,16 @@
       const setLevel = level => {
         if (level == "easy") {
           world = randomWorld(9, 9);
+          ghost.x = 7;
+          ghost.y = 7;
         } else if (level == "medium") {
           world = randomWorld(12, 12);
+          ghost.x = 10;
+          ghost.y = 10;
         } else if (level == "hard") {
           world = randomWorld(15, 15);
+          ghost.x = 13;
+          ghost.y = 13;
         }
         // Reset ninjaman position and score
         ninjaman.y = 1;
@@ -140,14 +164,32 @@
       document
         .getElementById("hard")
         .addEventListener("click", () => setLevel("hard"));
-      let worldDict = {
-        // assign desc
+
+      // assign desc for world elements
+      const worldDict = {
         0: "blank",
         1: "wall",
         2: "sushi",
         3: "onigiri"
       };
 
+      // Assign desc for ghost
+      const ghostDict = {
+        0: "red",
+        1: "pinky",
+        2: "pumpky",
+        3: "scaredy",
+        4: "bluey"
+      };
+      // Update ninjaman position
+      let updateNinja = () => {
+        document.getElementById("ninja").style.top = ninjaman.y * 40 + "px";
+        document.getElementById("ninja").style.left = ninjaman.x * 40 + "px";
+      };
+      let updateGhost = () => {
+        document.getElementById("ghost").style.top = ghost.y * 40 + "px";
+        document.getElementById("ghost").style.left = ghost.x * 40 + "px";
+      };
       // Generate HTML to draw world
       const drawWorld = () => {
         output = "";
@@ -161,6 +203,7 @@
           output += "</div>"; //close the "row" div
         }
 
+        // updateGhost();
         document.getElementById("world").innerHTML = output;
         document.getElementById("table").style.left =
           world[1].length * 40 + 100 + "px";
@@ -168,11 +211,7 @@
       drawWorld();
 
       let score = 0;
-      // Update ninjaman position
-      let updateNinja = () => {
-        document.getElementById("ninja").style.top = ninjaman.y * 40 + "px";
-        document.getElementById("ninja").style.left = ninjaman.x * 40 + "px";
-      };
+
       // Update score sheet
       let updateScore = score => {
         return (document.getElementById("score").innerHTML = score);
@@ -211,7 +250,66 @@
         updateScore(score);
         updateNinja();
         drawWorld();
+        ghostMove();
       };
+      // Ghost's movement
+      // Set random directions
+      const coor = ["x", "y"];
+      // Update ghost position
+
+      const ghostMove = () => {
+        let die = 0;
+        setInterval(() => {
+          // if (world[ghost.y][ghost.x - 1] != 1) {
+          //   ghost.x--;
+          // } else if (world[ghost.y - 1][ghost.x] != 1) {
+          //   ghost.y--;
+          // } else if (world[ghost.y][ghost.x + 1] != 1) {
+          //   ghost.x++;
+          // } else if (world[ghost.y + 1][ghost.x] != 1) {
+          //   ghost.y++;
+          // }
+          updateGhost();
+
+          if (ghost.x == ninjaman.x && ghost.y == ninjaman.y) {
+            console.log("Game Over!!");
+          }
+        }, 500);
+        // const move = () => {
+        //   ghost.x--;
+        //   console.log(ghost.x);
+        //   updateGhost();
+        // if (ghost.x != ninjaman.x || ghost.y != ninjaman.y) {
+        //   let xProxi = ghost.x - ninjaman.x;
+        //   let yProxi = ghost.y - ninjaman.y;
+        //   direction = coor[Math.floor(Math.random * coor.length)];
+        //   if (direction == "x" && xProxi > 0) {
+        // if (world[ghost.y][ghost.x - 1] != 1) {
+        //   ghost.x--;
+        // }
+        //   }
+        //   if (direction == "x" && xProxi < 0) {
+        // if (world[ghost.y][ghost.x + 1] != 1) {
+        //   ghost.x++;
+        // }
+        //   }
+        //   if (direction == "y" && yProxi > 0) {
+        // if (world[ghost.y - 1][ghost.x] != 1) {
+        //   ghost.y--;
+        // }
+        //   }
+        //   if (direction == "y" && yProxi < 0) {
+        // if (world[ghost.y + 1][ghost.x] != 1) {
+        //   ghost.y++;
+        // }
+        //   }
+        //   updateGhost();
+        // } else {
+        //   die++;
+        // }
+        // };
+      };
+      ghostMove();
     </script>
   </body>
 </html>
