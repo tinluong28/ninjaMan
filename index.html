@@ -1,4 +1,4 @@
-<html>
+<!DOCTYPE html>
   <head>
     <title>NinjaMan</title>
     <style type="text/css">
@@ -11,6 +11,9 @@
         width: 40px;
         height: 40px;
         display: inline-block;
+      }
+      .row {
+        height: 40px;
       }
       .blank {
         background-color: black;
@@ -150,9 +153,11 @@
         // Reset ninjaman position and score
         ninjaman.y = 1;
         ninjaman.x = 1;
+        score = 0;
         drawWorld();
         updateNinja();
         updateScore(0);
+        updateGhost();
       };
       // onclick events for the difficulty button
       document
@@ -250,31 +255,62 @@
         updateScore(score);
         updateNinja();
         drawWorld();
-        ghostMove();
       };
       // Ghost's movement
       // Set random directions
+
+      const ghostMove = (y,x) => {
+        let nextMove = world[y][x];
+        if(nextMove == 1){
+          return false;
+        }
+        ghost.x = x;
+        ghost.y = y;
+        const direction = [{y: ghost.y, x: ghost.x - 1}, {y: ghost.y, x: ghost.x+1}, {y: ghost.y-1, x: ghost.x},{y: ghost.y+1,x: ghost.x}];
+        
+        let movement = direction[Math.floor(Math.random()*direction.length)];
+
+        setInterval(()=>{
+          ghostMove(movement.y,movement.x)
+        }, 1000);
+
+        updateGhost();
+      }
+      ghostMove(ghost.y, ghost.x);
+
       const coor = ["x", "y"];
       // Update ghost position
-
-      const ghostMove = () => {
-        let die = 0;
-        setInterval(() => {
-          // if (world[ghost.y][ghost.x - 1] != 1) {
-          //   ghost.x--;
-          // } else if (world[ghost.y - 1][ghost.x] != 1) {
-          //   ghost.y--;
-          // } else if (world[ghost.y][ghost.x + 1] != 1) {
-          //   ghost.x++;
-          // } else if (world[ghost.y + 1][ghost.x] != 1) {
-          //   ghost.y++;
-          // }
-          updateGhost();
-
-          if (ghost.x == ninjaman.x && ghost.y == ninjaman.y) {
-            console.log("Game Over!!");
-          }
-        }, 500);
+      let direction = "left";
+      const directionChange = direction => {
+        switch (direction) {
+          case "left":
+            ghost.x--;
+          case "right":
+            ghost.x++;
+          case "top":
+            ghost.y--;
+          case "down":
+            ghost.y++;
+        }
+        updateGhost();
+      };
+      // const ghostMove = () => {
+      //   let lives = 3;
+      //   setInterval(() => {
+      //     directionChange(direction);
+      //     if (world[ghost.y][ghost.x - 1] = 1) {
+      //       direction = "left";
+      //     } else if (world[ghost.y - 1][ghost.x] != 1) {
+      //       direction = "top";
+      //     } else if (world[ghost.y][ghost.x + 1] != 1) {
+      //       direction = "right";
+      //     } else if (world[ghost.y + 1][ghost.x] != 1) {
+      //       direction = "down";
+      //     }
+      //     if (ghost.x == ninjaman.x && ghost.y == ninjaman.y) {
+      //       console.log("Game Over!!");
+      //     }
+      //   }, 500);
         // const move = () => {
         //   ghost.x--;
         //   console.log(ghost.x);
@@ -308,8 +344,8 @@
         //   die++;
         // }
         // };
-      };
-      ghostMove();
+      // };
+
     </script>
   </body>
 </html>
