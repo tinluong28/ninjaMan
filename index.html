@@ -69,11 +69,22 @@
       #score {
         display: inline-block;
       }
+      .lives {
+        text-align: left;
+        display: inline-block;
+      }
+      #lives {
+        display: inline-block;
+      }
       #mode {
         display: inline-block;
       }
       #level {
         display: inline-block;
+      }
+      #gameover {
+        color: red;
+        display: none;
       }
     </style>
   </head>
@@ -87,6 +98,10 @@
         <h1 id="score">0</h1>
       </div>
       <div>
+        <h1 class="lives">Lives:</h1>
+        <h1 id="lives">3</h1>
+      </div>
+      <div>
         <h1 id="mode">Mode: Easy</h1>
         <div id="level">
           <button id="easy">Easy(9x9)</button>
@@ -94,12 +109,15 @@
           <button id="hard">Hard(15x15)</button>
         </div>
       </div>
+      <h1 id="gameover">GAME OVER!! REFRESH PAGE TO PLAY AGAIN.</h1>
     </div>
 
     <script>
       // Initial keys for characters
       const worldChara = [0, 1, 2, 3];
       const ghostChara = [0, 1, 2, 3, 4];
+      let alive = true;
+      let lives = 3;
       // Set ninjman initial coordinates
       let ninjaman = {
         x: 1,
@@ -199,7 +217,15 @@
       let updateGhost = () => {
         document.getElementById("ghost").style.top = ghost.y * 40 + "px";
         document.getElementById("ghost").style.left = ghost.x * 40 + "px";
+        if(lives == 0){
+          alive = false;
+          window.alert("GAME OVER!! Refresh page to play again?")
+          document.getElementById("gameover").style.display = "block";
+        }
       };
+      let updateLives = () => {
+        document.getElementById("lives").innerHTML = lives;
+      }
       // Generate HTML to draw world
       const drawWorld = () => {
         output = "";
@@ -216,7 +242,8 @@
         // updateGhost();
         document.getElementById("world").innerHTML = output;
         document.getElementById("table").style.left =
-          world[1].length * 40 + 100 + "px";
+        world[1].length * 40 + 100 + "px";
+
       };
       drawWorld();
 
@@ -228,7 +255,7 @@
       };
       // Ninjaman's movement
       document.onkeydown = e => {
-        if (e.keyCode === 37) {
+        if(alive){if (e.keyCode === 37) {
           //LEFT
           if (world[ninjaman.y][ninjaman.x - 1] != 1) {
             ninjaman.x--;
@@ -259,7 +286,7 @@
         world[ninjaman.y][ninjaman.x] = 0;
         updateScore(score);
         updateNinja();
-        drawWorld();
+        drawWorld();}
       };
 
       //Cordinate of each spot
@@ -297,6 +324,18 @@
 
       const ghostMove = (y,x) => {
 
+                // x = lerp(x, ninjaman.x, 0.1);
+        // y = lerp(y, ninjaman.y, 0.1);
+
+      //   let possibleMoves = [
+      //   getSpot(ghost.x -1,ghost.y), //LEFT
+      //   getSpot(ghost.x +1, ghost.y), //RIGHT
+      //   getSpot(ghost.x, ghost.y -1), //UP
+      //   getSpot(ghost.x, ghost.y +1) //RIGHT
+      // ];
+      // possibleMoves.sort((a,b) => b-a);
+      let distX = ninjaman.x - ghost.x;
+      let distY = ninjaman.y - ghost.y;
 
 
        let direction = [
@@ -307,6 +346,7 @@
        ]
         
         let movement = direction[Math.floor(Math.random()*direction.length)];
+
         let nextMove = world[movement.y][movement.x];
 
         if(nextMove == 1){
@@ -316,11 +356,18 @@
           ghost.y = movement.y;
         }
 
-
+        world[ghost.y][ghost.x] = 0;
         updateGhost();
+        drawWorld();
+        if(ghost.x == ninjaman.x && ghost.y == ninjaman.y){
+          lives--;
+          updateLives();
+        }
       }
       setInterval(() => {
-        ghostMove(ghost.y, ghost.x)
+        if(alive){
+          ghostMove(ghost.y, ghost.x)
+        }
       },300);
 
 
