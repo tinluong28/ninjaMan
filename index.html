@@ -87,7 +87,7 @@
         <h1 id="score">0</h1>
       </div>
       <div>
-        <h1 id="mode">Mode:</h1>
+        <h1 id="mode">Mode: Easy</h1>
         <div id="level">
           <button id="easy">Easy(9x9)</button>
           <button id="medium">Medium(12x12)</button>
@@ -137,16 +137,20 @@
       let world = randomWorld(9, 9);
       // Set game difficulty
       const setLevel = level => {
+        let mode = "";
         if (level == "easy") {
           world = randomWorld(9, 9);
+          mode = "Mode: Easy";
           ghost.x = 7;
           ghost.y = 7;
         } else if (level == "medium") {
           world = randomWorld(12, 12);
+          mode = "Mode: Medium";
           ghost.x = 10;
           ghost.y = 10;
         } else if (level == "hard") {
           world = randomWorld(15, 15);
+          mode = "Mode: Hard";
           ghost.x = 13;
           ghost.y = 13;
         }
@@ -154,6 +158,7 @@
         ninjaman.y = 1;
         ninjaman.x = 1;
         score = 0;
+        document.getElementById("mode").innerHTML = mode;
         drawWorld();
         updateNinja();
         updateScore(0);
@@ -256,44 +261,69 @@
         updateNinja();
         drawWorld();
       };
+
+      //Cordinate of each spot
+      const getSpot = (x,y) => {
+        return y*world[0].length + x;
+      }
+      // Interpolation - have ghost catch pacman
+      const lerp = (start, end, amt) =>{
+        return (1-amt)*start + amt*end;
+      };
+
+      let moving = false;
+
+
+      // let distance = {x: ninjaman.x - ghost.x, y: ninjaman.y - ghost.y};
+      // // if x is negative - ghost goes left
+      // // if x is positive - ghost goes right
+      // // if y is negative - ghost goes up
+      // // if y is positive - ghost goes down
+      // // to reach ninja, distance needs to reach 0.
+      // if(distance.x < 0) {
+      //   ghost.x--;
+      // } else if(distance.x > 0) {
+      //   ghost.x++;
+      // }
+
+      // if(distance.y < 0){
+      //   ghost.y--;
+      // } else if(distance.y > 0){
+      //   ghost.y++;
+      // }
+      
       // Ghost's movement
       // Set random directions
 
       const ghostMove = (y,x) => {
-        let nextMove = world[y][x];
-        if(nextMove == 1){
-          return false;
-        }
-        ghost.x = x;
-        ghost.y = y;
-        const direction = [{y: ghost.y, x: ghost.x - 1}, {y: ghost.y, x: ghost.x+1}, {y: ghost.y-1, x: ghost.x},{y: ghost.y+1,x: ghost.x}];
+
+
+
+       let direction = [
+         {x: ghost.x -1, y: ghost.y}, //LEFT
+         {x: ghost.x +1, y: ghost.y}, //RIGHT
+         {x: ghost.x, y: ghost.y-1}, //UP
+         {x: ghost.x, y: ghost.y+1}, //DOWN
+       ]
         
         let movement = direction[Math.floor(Math.random()*direction.length)];
+        let nextMove = world[movement.y][movement.x];
 
-        setInterval(()=>{
-          ghostMove(movement.y,movement.x)
-        }, 1000);
+        if(nextMove == 1){
+          return;
+        } else {
+          ghost.x = movement.x;
+          ghost.y = movement.y;
+        }
+
 
         updateGhost();
       }
-      ghostMove(ghost.y, ghost.x);
+      setInterval(() => {
+        ghostMove(ghost.y, ghost.x)
+      },300);
 
-      const coor = ["x", "y"];
-      // Update ghost position
-      let direction = "left";
-      const directionChange = direction => {
-        switch (direction) {
-          case "left":
-            ghost.x--;
-          case "right":
-            ghost.x++;
-          case "top":
-            ghost.y--;
-          case "down":
-            ghost.y++;
-        }
-        updateGhost();
-      };
+
       // const ghostMove = () => {
       //   let lives = 3;
       //   setInterval(() => {
