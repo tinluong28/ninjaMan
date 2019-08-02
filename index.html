@@ -21,6 +21,35 @@
         height: 40px;
         display: inline-block;
       }
+      #table div {
+        margin-bottom:;;
+      }
+      #level {
+        margin: 5px 0px;
+      }
+      small {
+        color: purple;
+      }
+      button {
+        padding: 8px;
+        color: white;
+        border-radius: 10px;
+        font-weight: 800;
+        border: none;
+        outline: none;
+      }
+      button:hover {
+        color: black;
+      }
+      #easy {
+        background-color: blue;
+      }
+      #medium {
+        background-color: orange;
+      }
+      #hard {
+        background-color: red;
+      }
       .sushi {
         background-color: black;
         width: 40px;
@@ -76,15 +105,25 @@
       #lives {
         display: inline-block;
       }
-      #mode {
+      /* #mode {
         display: inline-block;
-      }
+      } */
       #level {
         display: inline-block;
       }
       #gameover {
         color: red;
         display: none;
+      }
+      #winning {
+        color: green;
+        display: none;
+      }
+      #title {
+        margin-bottom: 20px;
+      }
+      #title p {
+        font-style: italic; 
       }
     </style>
   </head>
@@ -93,23 +132,30 @@
     <div id="ninja"></div>
     <div id="ghost"></div>
     <div id="table">
-      <div>
-        <h1 class="score">Score:</h1>
-        <h1 id="score">0</h1>
+      <div id='title'>
+        <h1>Welcome to NinjaMan</h1>
+        <p>Your mission is to eat all the delicious sushi and onigiri before the Pumpkin Ghost eats you.</p>
+        <p><strong>May the odds be with you..</strong></p>
       </div>
       <div>
-        <h1 class="lives">Lives:</h1>
-        <h1 id="lives">3</h1>
+        <h2 class="score">Score:</h2>
+        <h2 id="score">0</h2>
       </div>
       <div>
-        <h1 id="mode">Mode: Easy</h1>
+        <h2 class="lives">Lives:</h2>
+        <h2 id="lives">3</h2>
+      </div>
+      <div>
+        <h2 id="mode">Mode: Easy</h2>
         <div id="level">
           <button id="easy">Easy(9x9)</button>
           <button id="medium">Medium(12x12)</button>
           <button id="hard">Hard(15x15)</button>
         </div>
       </div>
-      <h1 id="gameover">GAME OVER!! REFRESH PAGE TO PLAY AGAIN.</h1>
+      <small>**If you're stuck, restart <a href="/">here</a>.</small>
+      <h2 id="gameover">GAME OVER!! REFRESH PAGE TO PLAY AGAIN.</h2>
+      <h2 id="winning">YOU WON!! REFRESH PAGE TO PLAY AGAIN.</h2>
     </div>
 
     <script>
@@ -118,6 +164,7 @@
       const ghostChara = [0, 1, 2, 3, 4];
       let alive = true;
       let lives = 3;
+      let won = false;
       // Set ninjman initial coordinates
       let ninjaman = {
         x: 1,
@@ -128,6 +175,18 @@
         x: 7,
         y: 7
       };
+      // Set winner
+      const checkWinner = (world) => {
+        let cleared = true;
+        for (let i = 0; i < world.length; i++){
+          if(world[i].includes(2) || world[i].includes(3)){
+            return cleared = false;
+          }
+        }
+        if(cleared){
+          won = true;
+        }
+      }
       // Generate random world based on the num of row and col
       const randomWorld = (row, col) => {
         let world = [];
@@ -217,6 +276,10 @@
       let updateGhost = () => {
         document.getElementById("ghost").style.top = ghost.y * 40 + "px";
         document.getElementById("ghost").style.left = ghost.x * 40 + "px";
+        if(won){
+          window.alert("CONGRATULATIONS!! YOU WON! REFRESH TO PLAY AGAIN  ")
+          document.getElementById('winning').style.display = 'block';
+        }
         if(lives == 0){
           alive = false;
           window.alert("GAME OVER!! Refresh page to play again?")
@@ -301,39 +364,11 @@
       let moving = false;
 
 
-      // let distance = {x: ninjaman.x - ghost.x, y: ninjaman.y - ghost.y};
-      // // if x is negative - ghost goes left
-      // // if x is positive - ghost goes right
-      // // if y is negative - ghost goes up
-      // // if y is positive - ghost goes down
-      // // to reach ninja, distance needs to reach 0.
-      // if(distance.x < 0) {
-      //   ghost.x--;
-      // } else if(distance.x > 0) {
-      //   ghost.x++;
-      // }
-
-      // if(distance.y < 0){
-      //   ghost.y--;
-      // } else if(distance.y > 0){
-      //   ghost.y++;
-      // }
-      
-      // Ghost's movement
-      // Set random directions
+    
 
       const ghostMove = (y,x) => {
 
-                // x = lerp(x, ninjaman.x, 0.1);
-        // y = lerp(y, ninjaman.y, 0.1);
 
-      //   let possibleMoves = [
-      //   getSpot(ghost.x -1,ghost.y), //LEFT
-      //   getSpot(ghost.x +1, ghost.y), //RIGHT
-      //   getSpot(ghost.x, ghost.y -1), //UP
-      //   getSpot(ghost.x, ghost.y +1) //RIGHT
-      // ];
-      // possibleMoves.sort((a,b) => b-a);
       let distX = ninjaman.x - ghost.x;
       let distY = ninjaman.y - ghost.y;
 
@@ -358,7 +393,9 @@
 
         world[ghost.y][ghost.x] = 0;
         updateGhost();
-
+        if(!won){
+          checkWinner(world)
+        }
         drawWorld();
         if(ghost.x == ninjaman.x && ghost.y == ninjaman.y){
           lives--;
@@ -372,57 +409,7 @@
       },300);
 
 
-      // const ghostMove = () => {
-      //   let lives = 3;
-      //   setInterval(() => {
-      //     directionChange(direction);
-      //     if (world[ghost.y][ghost.x - 1] = 1) {
-      //       direction = "left";
-      //     } else if (world[ghost.y - 1][ghost.x] != 1) {
-      //       direction = "top";
-      //     } else if (world[ghost.y][ghost.x + 1] != 1) {
-      //       direction = "right";
-      //     } else if (world[ghost.y + 1][ghost.x] != 1) {
-      //       direction = "down";
-      //     }
-      //     if (ghost.x == ninjaman.x && ghost.y == ninjaman.y) {
-      //       console.log("Game Over!!");
-      //     }
-      //   }, 500);
-        // const move = () => {
-        //   ghost.x--;
-        //   console.log(ghost.x);
-        //   updateGhost();
-        // if (ghost.x != ninjaman.x || ghost.y != ninjaman.y) {
-        //   let xProxi = ghost.x - ninjaman.x;
-        //   let yProxi = ghost.y - ninjaman.y;
-        //   direction = coor[Math.floor(Math.random * coor.length)];
-        //   if (direction == "x" && xProxi > 0) {
-        // if (world[ghost.y][ghost.x - 1] != 1) {
-        //   ghost.x--;
-        // }
-        //   }
-        //   if (direction == "x" && xProxi < 0) {
-        // if (world[ghost.y][ghost.x + 1] != 1) {
-        //   ghost.x++;
-        // }
-        //   }
-        //   if (direction == "y" && yProxi > 0) {
-        // if (world[ghost.y - 1][ghost.x] != 1) {
-        //   ghost.y--;
-        // }
-        //   }
-        //   if (direction == "y" && yProxi < 0) {
-        // if (world[ghost.y + 1][ghost.x] != 1) {
-        //   ghost.y++;
-        // }
-        //   }
-        //   updateGhost();
-        // } else {
-        //   die++;
-        // }
-        // };
-      // };
+
 
     </script>
   </body>
